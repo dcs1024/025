@@ -35,27 +35,20 @@ jobs:
           JD_DEBUG: ${{ secrets.JD_DEBUG }}
           DD_BOT_TOKEN: ${{ secrets.DD_BOT_TOKEN }}
           DD_BOT_SECRET: ${{ secrets.DD_BOT_SECRET }}
-      - name: '运行 【更新免费拿商品信息】'
-        run: |
-          node jd_updateBarGain.js
-        env:
-          JD_COOKIE: ${{ secrets.JD_COOKIE }}
         
       - name: commit
         run: |
           git config --global user.email ${{ secrets.EMAIL }}
           git config --global user.name ${{ secrets.USER_NAME }}
           git add .
-          git commit -m "update by lxk0301" -a || echo "Nothing to update"
+          git commit -m "update by Action" -a || echo "Nothing to update"
       
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.TOKEN }}
           branch: master
-      #- name: Purge CDN Cache
-      #  run: curl https://purge.jsdelivr.net/gh/fickgit/updateTeam@master/jd_updateFactoryTuanId.json
-      # 我自己同步到gitee使用，其他人可忽略
+
       - name: sync github -> gitee
         uses: Yikun/hub-mirror-action@master
         if: env.dst_key
