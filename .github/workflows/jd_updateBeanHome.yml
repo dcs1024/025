@@ -35,6 +35,13 @@ jobs:
           DD_BOT_TOKEN: ${{ secrets.DD_BOT_TOKEN }}
           DD_BOT_SECRET: ${{ secrets.DD_BOT_SECRET }}
 
+      - name: '运行 【更新领现金邀请码】'
+        run: |
+          node jd_updateCash.js
+        env:
+          JD_COOKIE: ${{ secrets.JD_COOKIE }}
+          JD_DEBUG: ${{ secrets.JD_DEBUG }}
+          
       - name: commit
         run: |
           git config --global user.email ${{ secrets.EMAIL }}
