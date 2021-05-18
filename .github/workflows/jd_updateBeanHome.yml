@@ -48,3 +48,9 @@ jobs:
           git config --global user.name ${{ secrets.USER_NAME }}
           git add .
           git commit -m "update by Action" -a || echo "Nothing to update"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.TOKEN }}
+          branch: main
