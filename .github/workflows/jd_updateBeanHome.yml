@@ -1,7 +1,7 @@
 # This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: jd_updateBeanHome
+name: jd_updateBeanHome_cash_city
 
 on:
   workflow_dispatch:
@@ -38,6 +38,13 @@ jobs:
       - name: '运行 【更新领现金邀请码】'
         run: |
           node jd_updateCash.js
+        env:
+          JD_COOKIE: ${{ secrets.JD_COOKIE }}
+          JD_DEBUG: ${{ secrets.JD_DEBUG }}
+
+      - name: '运行 【更新手机狂欢城助力码】'
+        run: |
+          node jd_updateCity.js
         env:
           JD_COOKIE: ${{ secrets.JD_COOKIE }}
           JD_DEBUG: ${{ secrets.JD_DEBUG }}
