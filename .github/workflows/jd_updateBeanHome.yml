@@ -6,7 +6,7 @@ name: jd_updateBeanHome_cash_city
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 16 * * *'
+    - cron: '*/20,50 15,16 * * *'
   watch:
     types: started
   repository_dispatch:
