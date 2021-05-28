@@ -6,7 +6,7 @@ name: jd_updateCFD
 on:
   workflow_dispatch:
   schedule:
-    - cron: '25 15 * * *'
+    - cron: '20 15 * * *'
   watch:
     types: started
   repository_dispatch:
@@ -33,6 +33,7 @@ jobs:
       - name: '等待运行'
         run: |
               python3 accwait.py 0.1 0.1 59
+              python3 sjys.py
       - name: '运行 【更新财富岛互助码】'
         run: |
           node jd_updateCfd.js
