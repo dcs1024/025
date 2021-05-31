@@ -38,9 +38,9 @@ if ($.isNode()) {
         continue
       }
       await getUserInfo();
-      await $.wait(5000)
+      await $.wait(15000)
       await submitGroupId()
-      await $.wait(10000)
+      await $.wait(20000)
     }
   }
   await writeFile();
