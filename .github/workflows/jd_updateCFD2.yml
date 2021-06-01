@@ -30,7 +30,6 @@ jobs:
       - name: '运行 【更新财富岛互助码】'
         run: |
           node jd_updateCfd.js
-          node jd_updateRed.js
         env:
           JD_COOKIE: ${{ secrets.JD_COOKIE }}
           JD_DEBUG: ${{ secrets.JD_DEBUG }}
