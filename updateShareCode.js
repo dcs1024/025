@@ -1,4 +1,4 @@
-const $ = new Env('更新818互助码');
+const $ = new Env('更新5G超级盲盒互助码');
 // const cookie = process.env.JD_COOKIE;
 let cookiesArr = [], cookie = '';
 const notify = $.isNode() ? require('./sendNotify') : '';
@@ -10,7 +10,7 @@ if ($.isNode()) {
   if (process.env.JD_DEBUG && process.env.JD_DEBUG === 'false') console.log = () => {};
 }
 const fs = require('fs');
-const JD_API_HOST = 'https://rdcseason.m.jd.com/api';
+const JD_API_HOST = 'https://isp5g.m.jd.com';
 !(async () => {
   if (!cookiesArr[0]) {
     $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/', {"open-url": "https://bean.m.jd.com/"});
@@ -47,14 +47,14 @@ async function start() {
   // await fs.writeFileSync('jd_shareCodes.json', JSON.stringify(oldData));
   console.log('文件写入成功，新的shareCodes已经替换');
 }
-
+/*
 function getHelp() {
   return new Promise(resolve => {
     const options = {
       "url": `${JD_API_HOST}/task/getHelp?t=${Date.now()}`,
       "headers": {
         "Host": "rdcseason.m.jd.com",
-        "Accept": "application/json, text/plain, */*",
+        "Accept": "application/json, text/plain",
         "Connection": "keep-alive",
         "Cookie": cookie,
         "User-Agent": "jdapp;iPhone;9.1.0;14.0;e35caf0a69be42084e3c97eef56c3af7b0262d01;network/4g;supportApplePay/3;hasUPPay/0;pushNoticeIsOpen/1;model/iPhone11,8;addressid/2005183373;hasOCPay/0;appBuild/167348;supportBestPay/0;jdSupportDarkMode/0;pv/255.2;apprpd/Home_Main;ref/JDMainPageViewController;psq/1;ads/;psn/e35caf0a69be42084e3c97eef56c3af7b0262d01|701;jdv/0|kong|t_2010957099_|jingfen|3b5422e836e74037862fea3dcf1a6802|1600647811440|1600647814;adk/;app_device/IOS;pap/JA2015_311210|9.1.0|IOS 14.0;Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1",
@@ -83,10 +83,11 @@ function getHelp() {
     })
   })
 }
+*/
 function shareUrl() {
   return new Promise((resolve) => {
     const options = {
-      'url': `https://isp5g.m.jd.com/active/shareUrl?t=${Date.now()}`,
+      'url': `${JD_API_HOST}/active/shareUrl?t=${Date.now()}`,
       'headers': {
         "accept": "*/*",
         "accept-encoding": "gzip, deflate, br",
@@ -94,26 +95,26 @@ function shareUrl() {
         "content-type": "application/x-www-form-urlencoded",
         "cookie": cookie,
         "referer": "https://isp5g.m.jd.com",
-        "User-Agent": "jdapp;iPhone;9.1.0;14.0;e35caf0a69be42084e3c97eef56c3af7b0262d01;network/4g;supportApplePay/3;hasUPPay/0;pushNoticeIsOpen/1;model/iPhone11,8;addressid/2005183373;hasOCPay/0;appBuild/167348;supportBestPay/0;jdSupportDarkMode/0;pv/255.2;apprpd/Home_Main;ref/JDMainPageViewController;psq/1;ads/;psn/e35caf0a69be42084e3c97eef56c3af7b0262d01|701;jdv/0|kong|t_2010957099_|jingfen|3b5422e836e74037862fea3dcf1a6802|1600647811440|1600647814;adk/;app_device/IOS;pap/JA2015_311210|9.1.0|IOS 14.0;Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"
+        "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")
       }
     }
     $.get(options, async (err, resp, data) => {
       try {
-        // console.log('好友邀请码', data)
+        console.log('好友邀请码', data)
         data = JSON.parse(data);
         if (data['code'] === 5000) {
-          console.log(`重新运行一次脚本即可获取好友邀请码`)
+          console.log(`尝试多次运行脚本即可获取好友邀请码`)
         }
         // console.log('homeGoBrowse', data)
         if (data['code'] === 200) {
-          $.temp.push(data['data']);
+          if (data['data']) $.shareId.push(data['data']);
           console.log(`\n【京东账号${$.index}（${$.nickName || $.UserName}）的${$.name}好友互助码】${data['data']}\n`);
           console.log(`此邀请码一天一变化，旧的不可用`)
         }
       } catch (e) {
         $.logErr(e, resp);
       } finally {
-        resolve(data);
+        resolve();
       }
     })
   })
