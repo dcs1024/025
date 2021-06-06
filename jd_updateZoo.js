@@ -55,428 +55,468 @@ async function writeFile() {
 }
 async function zoo() {
     try {
-      $.signSingle = {};
-      $.homeData = {};
-      $.secretp = ``;
-      $.taskList = [];
-      $.shopSign = ``;
-      await takePostRequest('zoo_signSingle');
-      if (JSON.stringify($.signSingle) === `{}` || $.signSingle.bizCode !== 0) {
-        console.log($.signSingle.bizMsg);
-        return;
-      } else {
-        console.log(`\n获取活动信息`);
-      }
-      await $.wait(1000);
-      await takePostRequest('zoo_getHomeData');
-      $.userInfo =$.homeData.result.homeMainInfo
-      console.log(`\n\n当前分红：${$.userInfo.raiseInfo.redNum}份，当前等级:${$.userInfo.raiseInfo.scoreLevel}\n当前金币${$.userInfo.raiseInfo.remainScore}，下一关需要${$.userInfo.raiseInfo.nextLevelScore - $.userInfo.raiseInfo.curLevelStartScore}\n\n`);
-      await $.wait(1000);
-      await takePostRequest('zoo_getSignHomeData');
-      await $.wait(1000);
-      if($.signHomeData.todayStatus === 0){
-        console.log(`去签到`);
-        await takePostRequest('zoo_sign');
+        $.signSingle = {};
+        $.homeData = {};
+        $.secretp = ``;
+        $.taskList = [];
+        $.shopSign = ``;
+        await takePostRequest('zoo_signSingle');
+        if (JSON.stringify($.signSingle) === `{}` || $.signSingle.bizCode !== 0) {
+            console.log($.signSingle.bizMsg);
+            return;
+        } else {
+            console.log(`\n获取活动信息`);
+        }
         await $.wait(1000);
-      }else{
-        console.log(`已签到`);
-      }
-      let raiseInfo = $.homeData.result.homeMainInfo.raiseInfo;
-      if (Number(raiseInfo.totalScore) > Number(raiseInfo.nextLevelScore) && raiseInfo.buttonStatus === 1) {
-        console.log(`满足升级条件，去升级`);
-        await $.wait(3000);
-        await takePostRequest('zoo_raise');
-      }
-      raiseInfo = $.homeData.result.homeMainInfo.raiseInfo;
-      //======================================================怪兽大作战=================================================================================
-      $.pkHomeData = {};
-      await takePostRequest('zoo_pk_getHomeData');
-      if (JSON.stringify($.pkHomeData) === '{}') {
-        console.log(`获取PK信息异常`);
-        return;
-      }
-      await $.wait(1000);
-      $.pkTaskList = [];
-      if(!$.hotFlag) await takePostRequest('zoo_pk_getTaskDetail');
-      await $.wait(1000);
-      for (let i = 0; i < $.pkTaskList.length; i++) {
-        $.oneTask = $.pkTaskList[i];
-        if ($.oneTask.status === 1) {
-          $.activityInfoList = $.oneTask.shoppingActivityVos || $.oneTask.brandMemberVos || $.oneTask.followShopVo || $.oneTask.browseShopVo
-          for (let j = 0; j < $.activityInfoList.length; j++) {
-            $.oneActivityInfo = $.activityInfoList[j];
-            if ($.oneActivityInfo.status !== 1) {
-              continue;
-            }
-            console.log(`做任务：${$.oneActivityInfo.title || $.oneActivityInfo.taskName || $.oneActivityInfo.shopName};等待完成`);
-            await takePostRequest('zoo_pk_collectScore');
-            await $.wait(2000);
-            console.log(`任务完成`);
-          }
+        await takePostRequest('zoo_getHomeData');
+        $.userInfo = $.homeData.result.homeMainInfo
+        console.log(`\n\n当前分红：${$.userInfo.raiseInfo.redNum}份，当前等级:${$.userInfo.raiseInfo.scoreLevel}\n当前金币${$.userInfo.raiseInfo.remainScore}，下一关需要${$.userInfo.raiseInfo.nextLevelScore - $.userInfo.raiseInfo.curLevelStartScore}\n\n`);
+        await $.wait(1000);
+        await takePostRequest('zoo_getSignHomeData');
+        await $.wait(1000);
+        if ($.signHomeData.todayStatus === 0) {
+            console.log(`去签到`);
+            await takePostRequest('zoo_sign');
+            await $.wait(1000);
+        } else {
+            console.log(`已签到`);
         }
-      }
-      await $.wait(1000);
-      if (new Date().getHours() >= 18) {
-        console.log(`\n******开始【怪兽大作战守护红包】******\n`);
-        //await takePostRequest('zoo_pk_getTaskDetail');
-        let skillList = $.pkHomeData.result.groupInfo.skillList || [];
-        //activityStatus === 1未开始，2 已开始
-        $.doSkillFlag = true;
-        for (let i = 0; i < skillList.length && $.pkHomeData.result.activityStatus === 2 && $.doSkillFlag; i++) {
-          if (Number(skillList[i].num) > 0) {
-            $.skillCode = skillList[i].code;
-            for (let j = 0; j < Number(skillList[i].num) && $.doSkillFlag; j++) {
-              console.log(`使用技能`);
-              await takePostRequest('zoo_pk_doPkSkill');
-              await $.wait(2000);
-            }
-          }
+        let raiseInfo = $.homeData.result.homeMainInfo.raiseInfo;
+        if (Number(raiseInfo.totalScore) > Number(raiseInfo.nextLevelScore) && raiseInfo.buttonStatus === 1) {
+            console.log(`满足升级条件，去升级`);
+            await $.wait(3000);
+            await takePostRequest('zoo_raise');
         }
-      }
+        raiseInfo = $.homeData.result.homeMainInfo.raiseInfo;
+        //======================================================怪兽大作战=================================================================================
+        $.pkHomeData = {};
+        await takePostRequest('zoo_pk_getHomeData');
+        if (JSON.stringify($.pkHomeData) === '{}') {
+            console.log(`获取PK信息异常`);
+            return;
+        }
+        await $.wait(1000);
+        $.pkTaskList = [];
+        if (!$.hotFlag) await takePostRequest('zoo_pk_getTaskDetail');
+        await $.wait(1000);
+        for (let i = 0; i < $.pkTaskList.length; i++) {
+            $.oneTask = $.pkTaskList[i];
+            if ($.oneTask.status === 1) {
+                $.activityInfoList = $.oneTask.shoppingActivityVos || $.oneTask.brandMemberVos || $.oneTask.followShopVo || $.oneTask.browseShopVo
+                for (let j = 0; j < $.activityInfoList.length; j++) {
+                    $.oneActivityInfo = $.activityInfoList[j];
+                    if ($.oneActivityInfo.status !== 1) {
+                        continue;
+                    }
+                    console.log(`做任务：${$.oneActivityInfo.title || $.oneActivityInfo.taskName || $.oneActivityInfo.shopName};等待完成`);
+                    await takePostRequest('zoo_pk_collectScore');
+                    await $.wait(2000);
+                    console.log(`任务完成`);
+                }
+            }
+        }
+        await $.wait(1000);
+        if (new Date().getHours() >= 18) {
+            console.log(`\n******开始【怪兽大作战守护红包】******\n`);
+            //await takePostRequest('zoo_pk_getTaskDetail');
+            let skillList = $.pkHomeData.result.groupInfo.skillList || [];
+            //activityStatus === 1未开始，2 已开始
+            $.doSkillFlag = true;
+            for (let i = 0; i < skillList.length && $.pkHomeData.result.activityStatus === 2 && $.doSkillFlag; i++) {
+                if (Number(skillList[i].num) > 0) {
+                    $.skillCode = skillList[i].code;
+                    for (let j = 0; j < Number(skillList[i].num) && $.doSkillFlag; j++) {
+                        console.log(`使用技能`);
+                        await takePostRequest('zoo_pk_doPkSkill');
+                        await $.wait(2000);
+                    }
+                }
+            }
+        }
     } catch (e) {
-      $.logErr(e)
+        $.logErr(e)
     }
-  }
+}
 
-  async function takePostRequest(type) {
+async function takePostRequest(type) {
     let body = ``;
     let myRequest = ``;
     switch (type) {
-      case 'zoo_signSingle':
-        body = `functionId=zoo_signSingle&body={}&client=wh5&clientVersion=1.0.0`;
-        myRequest = await getPostRequest(`zoo_signSingle`, body);
-        break;
-      case 'zoo_getHomeData':
-        body = `functionId=zoo_getHomeData&body={}&client=wh5&clientVersion=1.0.0`;
-        myRequest = await getPostRequest(`zoo_getHomeData`, body);
-        break;
-      case 'helpHomeData':
-        body = `functionId=zoo_getHomeData&body={"inviteId":"${$.inviteId}"}&client=wh5&clientVersion=1.0.0`;
-        myRequest = await getPostRequest(`zoo_getHomeData`, body);
-        break;
-      case 'zoo_collectProduceScore':
-        body = getPostBody(type);
-        myRequest = await getPostRequest(`zoo_collectProduceScore`, body);
-        break;
-      case 'zoo_getFeedDetail':
-        body = `functionId=zoo_getFeedDetail&body={"taskId":"${$.taskId}"}&client=wh5&clientVersion=1.0.0`;
-        myRequest = await getPostRequest(`zoo_getFeedDetail`, body);
-        break;
-      case 'zoo_getTaskDetail':
-        body = `functionId=zoo_getTaskDetail&body={}&client=wh5&clientVersion=1.0.0`;
-        myRequest = await getPostRequest(`zoo_getTaskDetail`, body);
-        break;
-      case 'zoo_collectScore':
-        body = getPostBody(type);
-        //console.log(body);
-        myRequest = await getPostRequest(`zoo_collectScore`, body);
-        break;
-      case 'zoo_raise':
-        body = `functionId=zoo_raise&body={}&client=wh5&clientVersion=1.0.0`;
-        myRequest = await getPostRequest(`zoo_raise`, body);
-        break;
-      case 'help':
-        body = getPostBody(type);
-        //console.log(body);
-        myRequest = await getPostRequest(`zoo_collectScore`, body);
-        break;
-      case 'zoo_pk_getHomeData':
-        body = `functionId=zoo_pk_getHomeData&body={}&client=wh5&clientVersion=1.0.0`;
-        myRequest = await getPostRequest(`zoo_pk_getHomeData`, body);
-        break;
-      case 'zoo_pk_getTaskDetail':
-        body = `functionId=zoo_pk_getTaskDetail&body={}&client=wh5&clientVersion=1.0.0`;
-        myRequest = await getPostRequest(`zoo_pk_getTaskDetail`, body);
-        break;
-      case 'zoo_pk_collectScore':
-        body = getPostBody(type);
-        //console.log(body);
-        myRequest = await getPostRequest(`zoo_pk_collectScore`, body);
-        break;
-      case 'zoo_pk_doPkSkill':
-        body = `functionId=zoo_pk_doPkSkill&body={"skillType":"${$.skillCode}"}&client=wh5&clientVersion=1.0.0`;
-        myRequest = await getPostRequest(`zoo_pk_doPkSkill`, body);
-        break;
-      case 'pkHelp':
-        body = getPostBody(type);
-        myRequest = await getPostRequest(`zoo_pk_assistGroup`, body);
-        break;
-      case 'zoo_getSignHomeData':
-        body = `functionId=zoo_getSignHomeData&body={"notCount":"1"}&client=wh5&clientVersion=1.0.0`;
-        myRequest = await getPostRequest(`zoo_getSignHomeData`,body);
-        break;
-      case 'zoo_sign':
-        body = `functionId=zoo_sign&body={}&client=wh5&clientVersion=1.0.0`;
-        myRequest = await getPostRequest(`zoo_sign`,body);
-        break;
-      case 'wxTaskDetail':
-        body = `functionId=zoo_getTaskDetail&body={"appSign":"2","channel":1,"shopSign":""}&client=wh5&clientVersion=1.0.0`;
-        myRequest = await getPostRequest(`zoo_getTaskDetail`,body);
-        break;
-      case 'zoo_shopLotteryInfo':
-        body = `functionId=zoo_shopLotteryInfo&body={"shopSign":"${$.shopSign}"}&client=wh5&clientVersion=1.0.0`;
-        myRequest = await getPostRequest(`zoo_shopLotteryInfo`,body);
-        break;
-      case 'zoo_bdCollectScore':
-        body = getPostBody(type);
-        myRequest = await getPostRequest(`zoo_bdCollectScore`,body);
-        break;
-      case 'qryCompositeMaterials':
-        body = `functionId=qryCompositeMaterials&body={"qryParam":"[{\\"type\\":\\"advertGroup\\",\\"mapTo\\":\\"resultData\\",\\"id\\":\\"05371960\\"}]","activityId":"2s7hhSTbhMgxpGoa9JDnbDzJTaBB","pageId":"","reqSrc":"","applyKey":"jd_star"}&client=wh5&clientVersion=1.0.0`;
-        myRequest = await getPostRequest(`qryCompositeMaterials`,body);
-        break;
-      case 'zoo_boxShopLottery':
-        body = `functionId=zoo_boxShopLottery&body={"shopSign":"${$.shopSign}"}&client=wh5&clientVersion=1.0.0`;
-        myRequest = await getPostRequest(`zoo_boxShopLottery`,body);
-        break;
-      case `zoo_wishShopLottery`:
-        body = `functionId=zoo_wishShopLottery&body={"shopSign":"${$.shopSign}"}&client=wh5&clientVersion=1.0.0`;
-        myRequest = await getPostRequest(`zoo_boxShopLottery`,body);
-        break;
-      case `zoo_myMap`:
-        body = `functionId=zoo_myMap&body={}&client=wh5&clientVersion=1.0.0`;
-        myRequest = await getPostRequest(`zoo_myMap`,body);
-        break;
-      case 'zoo_getWelfareScore':
-        body = getPostBody(type);
-        myRequest = await getPostRequest(`zoo_getWelfareScore`,body);
-        break;
-      case 'jdjrTaskDetail':
-        body = `reqData={"eid":"","sdkToken":"jdd014JYKVE2S6UEEIWPKA4B5ZKBS4N6Y6X5GX2NXL4IYUMHKF3EEVK52RQHBYXRZ67XWQF5N7XB6Y2YKYRTGQW4GV5OFGPDPFP3MZINWG2A01234567"}`;
-        myRequest = await getPostRequest(`listTask`,body);
-        break;
-      case 'jdjrAcceptTask':
-        body = `reqData={"eid":"","sdkToken":"jdd014JYKVE2S6UEEIWPKA4B5ZKBS4N6Y6X5GX2NXL4IYUMHKF3EEVK52RQHBYXRZ67XWQF5N7XB6Y2YKYRTGQW4GV5OFGPDPFP3MZINWG2A01234567","id":"${$.taskId}"}`;
-        myRequest = await getPostRequest(`acceptTask`,body);
-        break;
-      case 'add_car':
-        body = getPostBody(type);
-        myRequest = await getPostRequest(`zoo_collectScore`,body);
-        break;
-      default:
-        console.log(`错误${type}`);
+        case 'zoo_signSingle':
+            body = `functionId=zoo_signSingle&body={}&client=wh5&clientVersion=1.0.0`;
+            myRequest = await getPostRequest(`zoo_signSingle`, body);
+            break;
+        case 'zoo_getHomeData':
+            body = `functionId=zoo_getHomeData&body={}&client=wh5&clientVersion=1.0.0`;
+            myRequest = await getPostRequest(`zoo_getHomeData`, body);
+            break;
+        case 'helpHomeData':
+            body = `functionId=zoo_getHomeData&body={"inviteId":"${$.inviteId}"}&client=wh5&clientVersion=1.0.0`;
+            myRequest = await getPostRequest(`zoo_getHomeData`, body);
+            break;
+        case 'zoo_collectProduceScore':
+            body = getPostBody(type);
+            myRequest = await getPostRequest(`zoo_collectProduceScore`, body);
+            break;
+        case 'zoo_getFeedDetail':
+            body = `functionId=zoo_getFeedDetail&body={"taskId":"${$.taskId}"}&client=wh5&clientVersion=1.0.0`;
+            myRequest = await getPostRequest(`zoo_getFeedDetail`, body);
+            break;
+        case 'zoo_getTaskDetail':
+            body = `functionId=zoo_getTaskDetail&body={}&client=wh5&clientVersion=1.0.0`;
+            myRequest = await getPostRequest(`zoo_getTaskDetail`, body);
+            break;
+        case 'zoo_collectScore':
+            body = getPostBody(type);
+            //console.log(body);
+            myRequest = await getPostRequest(`zoo_collectScore`, body);
+            break;
+        case 'zoo_raise':
+            body = `functionId=zoo_raise&body={}&client=wh5&clientVersion=1.0.0`;
+            myRequest = await getPostRequest(`zoo_raise`, body);
+            break;
+        case 'help':
+            body = getPostBody(type);
+            //console.log(body);
+            myRequest = await getPostRequest(`zoo_collectScore`, body);
+            break;
+        case 'zoo_pk_getHomeData':
+            body = `functionId=zoo_pk_getHomeData&body={}&client=wh5&clientVersion=1.0.0`;
+            myRequest = await getPostRequest(`zoo_pk_getHomeData`, body);
+            break;
+        case 'zoo_pk_getTaskDetail':
+            body = `functionId=zoo_pk_getTaskDetail&body={}&client=wh5&clientVersion=1.0.0`;
+            myRequest = await getPostRequest(`zoo_pk_getTaskDetail`, body);
+            break;
+        case 'zoo_pk_collectScore':
+            body = getPostBody(type);
+            //console.log(body);
+            myRequest = await getPostRequest(`zoo_pk_collectScore`, body);
+            break;
+        case 'zoo_pk_doPkSkill':
+            body = `functionId=zoo_pk_doPkSkill&body={"skillType":"${$.skillCode}"}&client=wh5&clientVersion=1.0.0`;
+            myRequest = await getPostRequest(`zoo_pk_doPkSkill`, body);
+            break;
+        case 'pkHelp':
+            body = getPostBody(type);
+            myRequest = await getPostRequest(`zoo_pk_assistGroup`, body);
+            break;
+        case 'zoo_getSignHomeData':
+            body = `functionId=zoo_getSignHomeData&body={"notCount":"1"}&client=wh5&clientVersion=1.0.0`;
+            myRequest = await getPostRequest(`zoo_getSignHomeData`, body);
+            break;
+        case 'zoo_sign':
+            body = `functionId=zoo_sign&body={}&client=wh5&clientVersion=1.0.0`;
+            myRequest = await getPostRequest(`zoo_sign`, body);
+            break;
+        case 'wxTaskDetail':
+            body = `functionId=zoo_getTaskDetail&body={"appSign":"2","channel":1,"shopSign":""}&client=wh5&clientVersion=1.0.0`;
+            myRequest = await getPostRequest(`zoo_getTaskDetail`, body);
+            break;
+        case 'zoo_shopLotteryInfo':
+            body = `functionId=zoo_shopLotteryInfo&body={"shopSign":"${$.shopSign}"}&client=wh5&clientVersion=1.0.0`;
+            myRequest = await getPostRequest(`zoo_shopLotteryInfo`, body);
+            break;
+        case 'zoo_bdCollectScore':
+            body = getPostBody(type);
+            myRequest = await getPostRequest(`zoo_bdCollectScore`, body);
+            break;
+        case 'qryCompositeMaterials':
+            body = `functionId=qryCompositeMaterials&body={"qryParam":"[{\\"type\\":\\"advertGroup\\",\\"mapTo\\":\\"resultData\\",\\"id\\":\\"05371960\\"}]","activityId":"2s7hhSTbhMgxpGoa9JDnbDzJTaBB","pageId":"","reqSrc":"","applyKey":"jd_star"}&client=wh5&clientVersion=1.0.0`;
+            myRequest = await getPostRequest(`qryCompositeMaterials`, body);
+            break;
+        case 'zoo_boxShopLottery':
+            body = `functionId=zoo_boxShopLottery&body={"shopSign":"${$.shopSign}"}&client=wh5&clientVersion=1.0.0`;
+            myRequest = await getPostRequest(`zoo_boxShopLottery`, body);
+            break;
+        case `zoo_wishShopLottery`:
+            body = `functionId=zoo_wishShopLottery&body={"shopSign":"${$.shopSign}"}&client=wh5&clientVersion=1.0.0`;
+            myRequest = await getPostRequest(`zoo_boxShopLottery`, body);
+            break;
+        case `zoo_myMap`:
+            body = `functionId=zoo_myMap&body={}&client=wh5&clientVersion=1.0.0`;
+            myRequest = await getPostRequest(`zoo_myMap`, body);
+            break;
+        case 'zoo_getWelfareScore':
+            body = getPostBody(type);
+            myRequest = await getPostRequest(`zoo_getWelfareScore`, body);
+            break;
+        case 'jdjrTaskDetail':
+            body = `reqData={"eid":"","sdkToken":"jdd014JYKVE2S6UEEIWPKA4B5ZKBS4N6Y6X5GX2NXL4IYUMHKF3EEVK52RQHBYXRZ67XWQF5N7XB6Y2YKYRTGQW4GV5OFGPDPFP3MZINWG2A01234567"}`;
+            myRequest = await getPostRequest(`listTask`, body);
+            break;
+        case 'jdjrAcceptTask':
+            body = `reqData={"eid":"","sdkToken":"jdd014JYKVE2S6UEEIWPKA4B5ZKBS4N6Y6X5GX2NXL4IYUMHKF3EEVK52RQHBYXRZ67XWQF5N7XB6Y2YKYRTGQW4GV5OFGPDPFP3MZINWG2A01234567","id":"${$.taskId}"}`;
+            myRequest = await getPostRequest(`acceptTask`, body);
+            break;
+        case 'add_car':
+            body = getPostBody(type);
+            myRequest = await getPostRequest(`zoo_collectScore`, body);
+            break;
+        default:
+            console.log(`错误${type}`);
     }
     return new Promise(async resolve => {
-      $.post(myRequest, (err, resp, data) => {
-        try {
-          //console.log(data);
-          dealReturn(type, data);
-        } catch (e) {
-          $.logErr(e, resp)
-        } finally {
-          resolve();
-        }
-      })
+        $.post(myRequest, (err, resp, data) => {
+            try {
+                //console.log(data);
+                dealReturn(type, data);
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
     })
-  }
+}
 
-  async function dealReturn(type, data) {
+async function dealReturn(type, data) {
     try {
-      data = JSON.parse(data);
+        data = JSON.parse(data);
     } catch (e) {
-      console.log(`返回异常：${data}`);
-      return;
+        console.log(`返回异常：${data}`);
+        return;
     }
     switch (type) {
-      case 'zoo_signSingle':
-        if (data.code === 0) $.signSingle = data.data
-        break;
-      case 'zoo_getHomeData':
-        if (data.code === 0) {
-          if (data.data['bizCode'] === 0) {
-            $.homeData = data.data;
-            $.secretp = data.data.result.homeMainInfo.secretp;
-            $.secretpInfo[$.UserName] = $.secretp;
-          }
-        }
-        break;
-      case 'helpHomeData':
-        console.log(data)
-        if (data.code === 0) {
-          $.secretp = data.data.result.homeMainInfo.secretp;
-          //console.log(`$.secretp：${$.secretp}`);
-        }
-        break;
-      case 'zoo_collectProduceScore':
-        if (data.code === 0 && data.data && data.data.result) {
-          console.log(`收取成功，获得：${data.data.result.produceScore}`);
-        }else{
-          console.log(JSON.stringify(data));
-        }
-        if(data.code === 0 && data.data && data.data.bizCode === -1002){
-          $.hotFlag = true;
-          console.log(`该账户脚本执行任务火爆，暂停执行任务，请手动做任务或者等待解决脚本火爆问题`)
-        }
-        break;
-      case 'zoo_getTaskDetail':
-        if (data.code === 0) {
-          console.log(`互助码：${data.data.result.inviteId || '助力已满，获取助力码失败'}`);
-          if (data.data.result.inviteId) {
-            $.inviteList.push({
-              'ues': $.UserName,
-              'secretp': $.secretp,
-              'inviteId': data.data.result.inviteId,
-              'max': false
-            });
-          }
-          $.taskList = data.data.result.taskVos;
-        }
-        break;
-      case 'zoo_collectScore':
-        $.callbackInfo = data;
-        break;
-      case 'zoo_raise':
-        if (data.code === 0) console.log(`升级成功`);
-        break;
-      case 'help':
-      case 'pkHelp':
-        //console.log(data);
-        switch (data.data.bizCode) {
-          case 0:
-            console.log(`助力成功`);
+        case 'zoo_signSingle':
+            if (data.code === 0) $.signSingle = data.data
             break;
-          case -201:
-            console.log(`助力已满`);
-            $.oneInviteInfo.max = true;
+        case 'zoo_getHomeData':
+            if (data.code === 0) {
+                if (data.data['bizCode'] === 0) {
+                    $.homeData = data.data;
+                    $.secretp = data.data.result.homeMainInfo.secretp;
+                    $.secretpInfo[$.UserName] = $.secretp;
+                }
+            }
             break;
-          case -202:
-            console.log(`已助力`);
+        case 'helpHomeData':
+            console.log(data)
+            if (data.code === 0) {
+                $.secretp = data.data.result.homeMainInfo.secretp;
+                //console.log(`$.secretp：${$.secretp}`);
+            }
             break;
-          case -8:
-            console.log(`已经助力过该队伍`);
+        case 'zoo_collectProduceScore':
+            if (data.code === 0 && data.data && data.data.result) {
+                console.log(`收取成功，获得：${data.data.result.produceScore}`);
+            } else {
+                console.log(JSON.stringify(data));
+            }
+            if (data.code === 0 && data.data && data.data.bizCode === -1002) {
+                $.hotFlag = true;
+                console.log(`该账户脚本执行任务火爆，暂停执行任务，请手动做任务或者等待解决脚本火爆问题`)
+            }
             break;
-          case -6:
-          case 108:
-            console.log(`助力次数已用光`);
-            $.canHelp = false;
+        case 'zoo_getTaskDetail':
+            if (data.code === 0) {
+                console.log(`互助码：${data.data.result.inviteId || '助力已满，获取助力码失败'}`);
+                if (data.data.result.inviteId) {
+                    $.inviteList.push({
+                        'ues': $.UserName,
+                        'secretp': $.secretp,
+                        'inviteId': data.data.result.inviteId,
+                        'max': false
+                    });
+                }
+                $.taskList = data.data.result.taskVos;
+            }
             break;
-          default:
-            console.log(`怪兽大作战助力失败：${JSON.stringify(data)}`);
-        }
-        break;
-      case 'zoo_pk_getHomeData':
-        if (data.code === 0) {
-          console.log(`PK互助码：${data.data.result.groupInfo.groupAssistInviteId}`);
-          if (data.data.result.groupInfo.groupAssistInviteId) $.pkInviteList.push(data.data.result.groupInfo.groupAssistInviteId);
-          $.pkHomeData = data.data;
-        }
-        break;
-      case 'zoo_pk_getTaskDetail':
-        if (data.code === 0) {
-          $.pkTaskList = data.data.result.taskVos;
-        }
-        break;
-      case 'zoo_getFeedDetail':
-        if (data.code === 0) {
-          $.feedDetailInfo = data.data.result.addProductVos[0];
-        }
-        break;
-      case 'zoo_pk_collectScore':
-        break;
-      case 'zoo_pk_doPkSkill':
-        if (data.data.bizCode === 0) console.log(`使用成功`);
-        if (data.data.bizCode === -2) {
-          console.log(`队伍任务已经完成，无法释放技能!`);
-          $.doSkillFlag = false;
-        }else if(data.data.bizCode === -2003){
-          console.log(`现在不能打怪兽`);
-          $.doSkillFlag = false;
-        }
-        break;
-      case 'zoo_getSignHomeData':
-        if(data.code === 0) {
-          $.signHomeData = data.data.result;
-        }
-        break;
-      case 'zoo_sign':
-        if(data.code === 0 && data.data.bizCode === 0) {
-          console.log(`签到获得成功`);
-          if (data.data.result.redPacketValue) console.log(`签到获得：${data.data.result.redPacketValue} 红包`);
-        }else{
-          console.log(`签到失败`);
-          console.log(data);
-        }
-        break;
-      case 'wxTaskDetail':
-        if (data.code === 0) {
-          $.wxTaskList = data.data.result.taskVos;
-        }
-        break;
-      case 'zoo_shopLotteryInfo':
-        if (data.code === 0) {
-          $.shopResult = data.data.result;
-        }
-        break;
-      case 'zoo_bdCollectScore':
-        if (data.code === 0) {
-          console.log(`签到获得：${data.data.result.score}`);
-        }
-        break;
-      case 'qryCompositeMaterials':
-        //console.log(data);
-        if (data.code === '0') {
-          $.shopInfoList = data.data.resultData.list;
-          console.log(`获取到${$.shopInfoList.length}个店铺`);
-        }
-        break
-      case 'zoo_boxShopLottery':
-        let result = data.data.result;
-        switch (result.awardType) {
-          case 8:
-            console.log(`获得金币：${result.rewardScore}`);
+        case 'zoo_collectScore':
+            $.callbackInfo = data;
             break;
-          case 5:
-            console.log(`获得：adidas能量`);
+        case 'zoo_raise':
+            if (data.code === 0) console.log(`升级成功`);
             break;
-          case 2:
-          case 3:
-            console.log(`获得优惠券：${result.couponInfo.usageThreshold} 优惠：${result.couponInfo.quota}，${result.couponInfo.useRange}`);
+        case 'help':
+        case 'pkHelp':
+            //console.log(data);
+            switch (data.data.bizCode) {
+                case 0:
+                    console.log(`助力成功`);
+                    break;
+                case -201:
+                    console.log(`助力已满`);
+                    $.oneInviteInfo.max = true;
+                    break;
+                case -202:
+                    console.log(`已助力`);
+                    break;
+                case -8:
+                    console.log(`已经助力过该队伍`);
+                    break;
+                case -6:
+                case 108:
+                    console.log(`助力次数已用光`);
+                    $.canHelp = false;
+                    break;
+                default:
+                    console.log(`怪兽大作战助力失败：${JSON.stringify(data)}`);
+            }
             break;
-          default:
-            console.log(`抽奖获得未知`);
+        case 'zoo_pk_getHomeData':
+            if (data.code === 0) {
+                console.log(`PK互助码：${data.data.result.groupInfo.groupAssistInviteId}`);
+                if (data.data.result.groupInfo.groupAssistInviteId) $.pkInviteList.push(data.data.result.groupInfo.groupAssistInviteId);
+                $.pkHomeData = data.data;
+            }
+            break;
+        case 'zoo_pk_getTaskDetail':
+            if (data.code === 0) {
+                $.pkTaskList = data.data.result.taskVos;
+            }
+            break;
+        case 'zoo_getFeedDetail':
+            if (data.code === 0) {
+                $.feedDetailInfo = data.data.result.addProductVos[0];
+            }
+            break;
+        case 'zoo_pk_collectScore':
+            break;
+        case 'zoo_pk_doPkSkill':
+            if (data.data.bizCode === 0) console.log(`使用成功`);
+            if (data.data.bizCode === -2) {
+                console.log(`队伍任务已经完成，无法释放技能!`);
+                $.doSkillFlag = false;
+            } else if (data.data.bizCode === -2003) {
+                console.log(`现在不能打怪兽`);
+                $.doSkillFlag = false;
+            }
+            break;
+        case 'zoo_getSignHomeData':
+            if (data.code === 0) {
+                $.signHomeData = data.data.result;
+            }
+            break;
+        case 'zoo_sign':
+            if (data.code === 0 && data.data.bizCode === 0) {
+                console.log(`签到获得成功`);
+                if (data.data.result.redPacketValue) console.log(`签到获得：${data.data.result.redPacketValue} 红包`);
+            } else {
+                console.log(`签到失败`);
+                console.log(data);
+            }
+            break;
+        case 'wxTaskDetail':
+            if (data.code === 0) {
+                $.wxTaskList = data.data.result.taskVos;
+            }
+            break;
+        case 'zoo_shopLotteryInfo':
+            if (data.code === 0) {
+                $.shopResult = data.data.result;
+            }
+            break;
+        case 'zoo_bdCollectScore':
+            if (data.code === 0) {
+                console.log(`签到获得：${data.data.result.score}`);
+            }
+            break;
+        case 'qryCompositeMaterials':
+            //console.log(data);
+            if (data.code === '0') {
+                $.shopInfoList = data.data.resultData.list;
+                console.log(`获取到${$.shopInfoList.length}个店铺`);
+            }
+            break
+        case 'zoo_boxShopLottery':
+            let result = data.data.result;
+            switch (result.awardType) {
+                case 8:
+                    console.log(`获得金币：${result.rewardScore}`);
+                    break;
+                case 5:
+                    console.log(`获得：adidas能量`);
+                    break;
+                case 2:
+                case 3:
+                    console.log(`获得优惠券：${result.couponInfo.usageThreshold} 优惠：${result.couponInfo.quota}，${result.couponInfo.useRange}`);
+                    break;
+                default:
+                    console.log(`抽奖获得未知`);
+                    console.log(JSON.stringify(data));
+            }
+            break
+        case 'zoo_wishShopLottery':
             console.log(JSON.stringify(data));
-        }
-        break
-      case 'zoo_wishShopLottery':
-        console.log(JSON.stringify(data));
-        break
-      case `zoo_myMap`:
-        if (data.code === 0) {
-          $.myMapList = data.data.result.sceneMap.sceneInfo;
-        }
-        break;
-      case 'zoo_getWelfareScore':
-        if (data.code === 0) {
-          console.log(`分享成功，获得：${data.data.result.score}`);
-        }
-        break;
-      case 'jdjrTaskDetail':
-        if (data.resultCode === 0) {
-          $.jdjrTaskList = data.resultData.top;
-        }
-        break;
-      case 'jdjrAcceptTask':
-        if (data.resultCode === 0) {
-          console.log(`领任务成功`);
-        }
-        break;
-      case 'add_car':
-        if (data.code === 0) {
-          let acquiredScore = data.data.result.acquiredScore;
-          if(Number(acquiredScore) > 0){
-            console.log(`加购成功,获得金币:${acquiredScore}`);
-          }else{
-            console.log(`加购成功`);
-          }
-        }else{
-          console.log(JSON.stringify(data));
-          console.log(`加购失败`);
-        }
-        break
-      default:
-        console.log(`未判断的异常${type}`);
+            break
+        case `zoo_myMap`:
+            if (data.code === 0) {
+                $.myMapList = data.data.result.sceneMap.sceneInfo;
+            }
+            break;
+        case 'zoo_getWelfareScore':
+            if (data.code === 0) {
+                console.log(`分享成功，获得：${data.data.result.score}`);
+            }
+            break;
+        case 'jdjrTaskDetail':
+            if (data.resultCode === 0) {
+                $.jdjrTaskList = data.resultData.top;
+            }
+            break;
+        case 'jdjrAcceptTask':
+            if (data.resultCode === 0) {
+                console.log(`领任务成功`);
+            }
+            break;
+        case 'add_car':
+            if (data.code === 0) {
+                let acquiredScore = data.data.result.acquiredScore;
+                if (Number(acquiredScore) > 0) {
+                    console.log(`加购成功,获得金币:${acquiredScore}`);
+                } else {
+                    console.log(`加购成功`);
+                }
+            } else {
+                console.log(JSON.stringify(data));
+                console.log(`加购失败`);
+            }
+            break
+        default:
+            console.log(`未判断的异常${type}`);
     }
-  }
+}
+
+async function getPostRequest(type, body) {
+    let url = `https://api.m.jd.com/client.action?functionId=${type}`;
+    if (type === 'listTask' || type === 'acceptTask') {
+        url = `https://ms.jr.jd.com/gw/generic/hy/h5/m/${type}`;
+    }
+    const method = `POST`;
+    const headers = {
+        'Accept': `application/json, text/plain, */*`,
+        'Origin': `https://wbbny.m.jd.com`,
+        'Accept-Encoding': `gzip, deflate, br`,
+        'Cookie': $.cookie,
+        'Content-Type': `application/x-www-form-urlencoded`,
+        'Host': `api.m.jd.com`,
+        'Connection': `keep-alive`,
+        'User-Agent': $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
+        'Referer': `https://wbbny.m.jd.com`,
+        'Accept-Language': `zh-cn`
+    };
+    return { url: url, method: method, headers: headers, body: body };
+}
+
+function getPostBody(type) {
+    let taskBody = '';
+    if (type === 'help') {
+        taskBody = `functionId=zoo_collectScore&body=${JSON.stringify({ "taskId": 2, "inviteId": $.inviteId, "actionType": 1, "ss": getBody() })}&client=wh5&clientVersion=1.0.0`
+    } else if (type === 'pkHelp') {
+        taskBody = `functionId=zoo_pk_assistGroup&body=${JSON.stringify({ "confirmFlag": 1, "inviteId": $.pkInviteId, "ss": getBody() })}&client=wh5&clientVersion=1.0.0`;
+    } else if (type === 'zoo_collectProduceScore') {
+        taskBody = `functionId=zoo_collectProduceScore&body=${JSON.stringify({ "ss": getBody() })}&client=wh5&clientVersion=1.0.0`;
+    } else if (type === 'zoo_getWelfareScore') {
+        taskBody = `functionId=zoo_getWelfareScore&body=${JSON.stringify({ "type": 2, "currentScence": $.currentScence, "ss": getBody() })}&client=wh5&clientVersion=1.0.0`;
+    } else if (type === 'add_car') {
+        taskBody = `functionId=zoo_collectScore&body=${JSON.stringify({ "taskId": $.taskId, "taskToken": $.taskToken, "actionType": 1, "ss": getBody() })}&client=wh5&clientVersion=1.0.0`
+    } else {
+        taskBody = `functionId=${type}&body=${JSON.stringify({ "taskId": $.oneTask.taskId, "actionType": 1, "taskToken": $.oneActivityInfo.taskToken, "ss": getBody() })}&client=wh5&clientVersion=1.0.0`
+    }
+    return taskBody
+}
+
 function TotalBean() {
   return new Promise(async resolve => {
     const options = {
