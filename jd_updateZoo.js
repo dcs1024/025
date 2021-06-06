@@ -14,29 +14,29 @@ if ($.isNode()) {
 const JD_API_HOST = 'https://api.m.jd.com/client.action';
 $.pkInviteList = [];
 !(async () => {
-  if (!cookiesArr[0]) {
-    $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
-    return;
-  }
-  for (let i = 0; i < cookiesArr.length; i++) {
-    if (cookiesArr[i]) {
-      cookie = cookiesArr[i];
-      $.UserName = decodeURIComponent(cookie.match(/pt_pin=(.+?);/) && cookie.match(/pt_pin=(.+?);/)[1])
-      $.index = i + 1;
-      $.isLogin = true;
-      $.nickName = '';
-      message = '';
-      await TotalBean();
-      console.log(`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
-      if (!$.isLogin) {
-        $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
-
-        if ($.isNode()) {
-          await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
+    if (!cookiesArr[0]) {
+      $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
+      return;
+    }
+    for (let i = 0; i < cookiesArr.length; i++) {
+      if (cookiesArr[i]) {
+        $.cookie = cookiesArr[i];
+        $.UserName = decodeURIComponent($.cookie.match(/pt_pin=([^; ]+)(?=;?)/) && $.cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
+        $.index = i + 1;
+        $.isLogin = true;
+        $.nickName = $.UserName;
+        $.hotFlag = false; //是否火爆
+        await TotalBean();
+        console.log(`\n*****开始【京东账号${$.index}】${$.nickName || $.UserName}*****\n`);
+        console.log(`\n如有未完成的任务，请多执行几次\n`);
+        if (!$.isLogin) {
+          $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
+          if ($.isNode()) {
+            await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
+          }
+          continue
         }
-        continue
-      }
-      await zoo();
+        await zoo();
       if($.hotFlag)$.secretpInfo[$.UserName] = false;//火爆账号不执行助力
     }
   }
@@ -116,23 +116,6 @@ async function zoo() {
             }
         }
         await $.wait(1000);
-        if (new Date().getHours() >= 18) {
-            console.log(`\n******开始【怪兽大作战守护红包】******\n`);
-            //await takePostRequest('zoo_pk_getTaskDetail');
-            let skillList = $.pkHomeData.result.groupInfo.skillList || [];
-            //activityStatus === 1未开始，2 已开始
-            $.doSkillFlag = true;
-            for (let i = 0; i < skillList.length && $.pkHomeData.result.activityStatus === 2 && $.doSkillFlag; i++) {
-                if (Number(skillList[i].num) > 0) {
-                    $.skillCode = skillList[i].code;
-                    for (let j = 0; j < Number(skillList[i].num) && $.doSkillFlag; j++) {
-                        console.log(`使用技能`);
-                        await takePostRequest('zoo_pk_doPkSkill');
-                        await $.wait(2000);
-                    }
-                }
-            }
-        }
     } catch (e) {
         $.logErr(e)
     }
@@ -518,46 +501,46 @@ function getPostBody(type) {
 }
 
 function TotalBean() {
-  return new Promise(async resolve => {
-    const options = {
-      url: "https://me-api.jd.com/user_new/info/GetJDUserInfoUnion",
-      headers: {
-        Host: "me-api.jd.com",
-        Accept: "*/*",
-        Connection: "keep-alive",
-        Cookie: cookie,
-        "User-Agent": "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1",
-        "Accept-Language": "zh-cn",
-        "Referer": "https://home.m.jd.com/myJd/newhome.action?sceneval=2&ufc=&",
-        "Accept-Encoding": "gzip, deflate, br"
-      }
-    }
-    $.get(options, (err, resp, data) => {
-      try {
-        if (err) {
-          $.logErr(err)
-        } else {
-          if (data) {
-            data = JSON.parse(data);
-            if (data['retcode'] === "1001") {
-              $.isLogin = false; //cookie过期
-              return;
-            }
-            if (data['retcode'] === "0" && data.data && data.data.hasOwnProperty("userInfo")) {
-              $.nickName = data.data.userInfo.baseInfo.nickname;
-            }
-          } else {
-            $.log('京东服务器返回空数据');
-          }
+    return new Promise(async resolve => {
+      const options = {
+        url: "https://me-api.jd.com/user_new/info/GetJDUserInfoUnion",
+        headers: {
+          Host: "me-api.jd.com",
+          Accept: "*/*",
+          Connection: "keep-alive",
+          Cookie: $.cookie,
+          "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
+          "Accept-Language": "zh-cn",
+          "Referer": "https://home.m.jd.com/myJd/newhome.action?sceneval=2&ufc=&",
+          "Accept-Encoding": "gzip, deflate, br"
         }
-      } catch (e) {
-        $.logErr(e)
-      } finally {
-        resolve();
       }
+      $.get(options, (err, resp, data) => {
+        try {
+          if (err) {
+            $.logErr(err)
+          } else {
+            if (data) {
+              data = JSON.parse(data);
+              if (data['retcode'] === "1001") {
+                $.isLogin = false; //cookie过期
+                return;
+              }
+              if (data['retcode'] === "0" && data.data && data.data.hasOwnProperty("userInfo")) {
+                $.nickName = data.data.userInfo.baseInfo.nickname;
+              }
+            } else {
+              $.log('京东服务器返回空数据');
+            }
+          }
+        } catch (e) {
+          $.logErr(e)
+        } finally {
+          resolve();
+        }
+      })
     })
-  })
-}
+  }
 
 function safeGet(data) {
   try {
