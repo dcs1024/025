@@ -1,5 +1,4 @@
 const fs = require('fs')
-$.packetIdArr = [];
 const $ = new Env('京喜领88元红包');
 $['packetIdArr'] = [];
 const notify = $['isNode']() ? require('./sendNotify') : {};
