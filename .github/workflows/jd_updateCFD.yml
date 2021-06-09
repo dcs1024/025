@@ -26,14 +26,6 @@ jobs:
       - name: npm install
         run: |
           npm install
-      - name: Set up Python 3.7
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.7
-      - name: '等待运行'
-        run: |
-              python3 accwait.py 0.1 0.1 59
-              python3 sjys.py
       - name: '运行 【更新财富岛互助码】'
         run: |
           node jd_updateCfd.js
@@ -53,4 +45,3 @@ jobs:
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.TOKEN }}
-          branch: main
