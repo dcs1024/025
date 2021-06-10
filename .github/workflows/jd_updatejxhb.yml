@@ -6,7 +6,7 @@ name: jd_updatejxhb
 on:
   workflow_dispatch:
   schedule:
-    - cron: '53 15 * * *'
+    - cron: '53 22,0-15/3 * * *'
   watch:
     types: started
   repository_dispatch:
