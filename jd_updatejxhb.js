@@ -125,9 +125,7 @@ function getUserInfo() {
               console.log(`6个阶梯红包已全部拆完\n`)
             } else {
               if (data.Data.strUserPin) {
-                $.packetIdArr.push({
-                  strUserPin: data.Data.strUserPin
-                })
+                $.packetIdArr.push(data.Data.strUserPin)
               }
             }
           } else {
