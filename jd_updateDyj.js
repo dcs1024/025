@@ -78,8 +78,8 @@ function info() {
         data = JSON.parse(data);
         if (data.code == 0) {
           console.log('你的活动ID：' + data.data.redEnvelopeId + '\n你的邀请码:' + data.data.markedPin)
-          $.redEnvelopeId.push(data.Data.redEnvelopeId)
-          $.markedPin.push(data.Data.markedPin)
+          $.redEnvelopeId.push(data.data.redEnvelopeId)
+          $.markedPin.push(data.data.markedPin)
         }
       } catch (e) {
         $.logErr(e, resp);
