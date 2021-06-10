@@ -13,10 +13,9 @@ if ($.isNode()) {
   cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
 }
 const JD_API_HOST = 'https://api.m.jd.com/client.action';
-$.item = [];
+$.redEnvelopeId = [];
+$.markedPin = [];
 !(async () => {
-  $.redEnvelopeId = []
-  $.markedPin = []
   if (!cookiesArr[0]) {
     $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
     return;
@@ -51,16 +50,16 @@ $.item = [];
     $.done();
   })
 
-  async function writeFile() {
-    const info = {
-      redEnvelopeId : $.redEnvelopeId,
-      inviter : $.markedPin
-    }
-    if (!fs.existsSync(`./shareCodes`)) fs.mkdirSync(`./shareCodes`);
-    await fs.writeFileSync(`./shareCodes/dyj.json`, JSON.stringify(info));
-    console.log(`\n${JSON.stringify(info)}\n`)
-    console.log(`文件写入成功`);
+async function writeFile() {
+  const shareCodeList = {
+    redEnvelopeId: $.redEnvelopeId,
+    inviter: $.markedPin
   }
+  if (!fs.existsSync(`./shareCodes`)) fs.mkdirSync(`./shareCodes`);
+  await fs.writeFileSync(`./shareCodes/dyj.json`, JSON.stringify(shareCodeList));
+  console.log(`\n${JSON.stringify(shareCodeList)}\n`)
+  console.log(`文件写入成功`);
+}
 
 function info() {
   return new Promise(async (resolve) => {
