@@ -32,6 +32,7 @@ const BASE_URL = 'https://wq.jd.com/cubeactive/steprewardv3'
     await TotalBean();
     console.log(`\n*****开始【京东账号${$.index}】${$.nickName || $.UserName}*****\n`);
     await main();
+    await writeFile();
   }
   //互助
   for (let i = 0; i < cookiesArr.length; i++) {
