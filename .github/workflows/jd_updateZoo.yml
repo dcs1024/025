@@ -6,7 +6,7 @@ name: jd_updateZoo
 on:
   workflow_dispatch:
   schedule:
-    - cron: '45 15 * * *'
+    - cron: '49 15 * * *'
   watch:
     types: started
   repository_dispatch:
