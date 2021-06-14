@@ -75,7 +75,7 @@ function getUserInfo() {
             strMyShareId,
           } = JSON.parse(data);
           $.log(`\n获取用户信息：${sErrMsg}\n${$.showLog ? data : ""}`);
-          // if (strMyShareId) $.strMyShareIds.push(strMyShareId)
+          if (strMyShareId) $.strMyShareIds.push(strMyShareId)
           $.canHelp = true;
           for(let key of Object.keys(SceneList)){
             let vo = SceneList[key]
